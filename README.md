@@ -33,6 +33,22 @@ This repo is the **identity layer only**. The policy engine (Nomos) and custody 
 are out of scope and referenced only by interface: `𝒩` is an abstract "authorized engine set," and
 "execution proof" is an abstract write precondition the registry records but does not itself verify.
 
+## Deployments
+
+ANID is an **exclusive Binance (BNB Chain) primitive** — the reference deployment runs on BNB Chain.
+
+### BNB Smart Chain testnet (chain 97)
+
+| Registry           | Address                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| IdentityRegistry   | [`0x24a733f080319F483684f47a15CfF33328c98f31`](https://testnet.bscscan.com/address/0x24a733f080319F483684f47a15CfF33328c98f31) |
+| EngineRegistry     | [`0xC866b01C238A5cfd442957C400Cd39aD684B5A77`](https://testnet.bscscan.com/address/0xC866b01C238A5cfd442957C400Cd39aD684B5A77) |
+| ReputationRegistry | [`0x16e8394F84614379f606AEfa30dE39f906C0ea00`](https://testnet.bscscan.com/address/0x16e8394F84614379f606AEfa30dE39f906C0ea00) |
+| ValidationRegistry | [`0x0Fe9E9fFD9D87B33bE203A52Ad9b38bE068eD455`](https://testnet.bscscan.com/address/0x0Fe9E9fFD9D87B33bE203A52Ad9b38bE068eD455) |
+
+`ReputationRegistry` is wired to the Engine + Identity registries with `λ = 0.9` (9e17). These
+addresses are also exported from the SDK as `DEPLOYMENTS[97]`.
+
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). © 2026 Nien Labs.

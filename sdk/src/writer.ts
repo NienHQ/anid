@@ -1,5 +1,5 @@
 import {ZeroHash} from "ethers";
-import type {BigNumberish, ContractTransactionResponse, Signer} from "ethers";
+import type {BigNumberish, ContractTransactionResponse, Overrides, Signer} from "ethers";
 import {
   EngineRegistry,
   EngineRegistry__factory,
@@ -43,7 +43,10 @@ export class EngineClient {
   }
 
   /** Record one execution-bound outcome. Throws (reverts) if preconditions fail. */
-  recordOutcome(p: RecordOutcomeParams): Promise<ContractTransactionResponse> {
+  recordOutcome(
+    p: RecordOutcomeParams,
+    overrides: Overrides = {},
+  ): Promise<ContractTransactionResponse> {
     if (p.proof.ref === ZeroHash || /^0x0{64}$/.test(p.proof.ref)) {
       throw new Error("execution proof ref must be non-zero (no-proof-no-write)");
     }
@@ -54,6 +57,7 @@ export class EngineClient {
       {trustDelta: toWad(p.trust), perfDelta: toWad(p.performance)},
       p.feedbackCommit ?? ZeroHash,
       p.policyId ?? ZeroHash,
+      overrides,
     );
   }
 }
@@ -72,17 +76,24 @@ export class AdminClient {
   }
 
   /** Add an engine to 𝒩 (owner only). */
-  registerEngine(engine: string): Promise<ContractTransactionResponse> {
-    return this.engine.register(engine);
+  registerEngine(engine: string, overrides: Overrides = {}): Promise<ContractTransactionResponse> {
+    return this.engine.register(engine, overrides);
   }
 
   /** Remove an engine from 𝒩 (owner only). Revokes write authority live. */
-  deregisterEngine(engine: string): Promise<ContractTransactionResponse> {
-    return this.engine.deregister(engine);
+  deregisterEngine(
+    engine: string,
+    overrides: Overrides = {},
+  ): Promise<ContractTransactionResponse> {
+    return this.engine.deregister(engine, overrides);
   }
 
   /** Register (mint) an agent id to an owner. */
-  registerAgent(agentId: BigNumberish, owner: string): Promise<ContractTransactionResponse> {
-    return this.identity.register(agentId, owner);
+  registerAgent(
+    agentId: BigNumberish,
+    owner: string,
+    overrides: Overrides = {},
+  ): Promise<ContractTransactionResponse> {
+    return this.identity.register(agentId, owner, overrides);
   }
 }
