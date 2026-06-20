@@ -1,0 +1,17 @@
+# Foundry
+out/
+cache/
+# keep broadcast/ (deployed addresses) tracked
+
+# Node / SDK (later)
+node_modules/
+dist/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+*.swp
