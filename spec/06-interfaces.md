@@ -59,12 +59,18 @@ See the proof-tier table in [02-reputation.md](02-reputation.md).
 ## 3. `IReputationRegistry` — the fork's surface
 
 ```solidity
+// Two-score model → one signed reward per score, each in [−1e18, 1e18] (WAD-scaled).
+struct Outcome {
+    int256 trustDelta;   // g_trust(oₜ): settlement / counterparty outcome
+    int256 perfDelta;    // g_perf(oₜ):  executed (+) vs blocked / reverted (−)
+}
+
 interface IReputationRegistry {
     function recordOutcome(
         uint256 agentId,
         ExecutionProof calldata proof,
         bytes32 counterpartyId,   // enforced independent of agentId
-        int256  scoreDelta,       // signed reward, feeds g(oₜ) ∈ [−1,1]
+        Outcome calldata outcome, // signed rewards, one per score
         bytes32 feedbackCommit,   // keccak of off-chain evidence
         bytes32 policyId          // which engine policy was satisfied / violated
     ) external;                   // onlyRegisteredEngine
@@ -77,7 +83,10 @@ interface IReputationRegistry {
         address indexed engine,
         bytes32 counterpartyId,
         ProofKind proofKind,
-        int256  scoreDelta,
+        bytes32 proofRef,
+        int256  trustDelta,
+        int256  perfDelta,
+        bytes32 feedbackCommit,
         bytes32 policyId
     );
 }
@@ -92,9 +101,15 @@ provenance** (`n`, `distinctEngines`) so consumers can discount cartels (R-REP-8
 ```solidity
 interface IIdentityRegistry {
     function ownerOf(uint256 agentId) external view returns (address);
+    function exists(uint256 agentId) external view returns (bool);
+    function register(uint256 agentId, address owner) external;
     event AgentRegistered(uint256 indexed agentId, address indexed owner);
 }
 ```
+
+The Reputation registry uses `exists` + `ownerOf` to enforce counterparty
+independence (R-REP-4): a write whose counterparty resolves to a different agent
+under the **same owner** is rejected as self-dealing.
 
 ERC-721-shaped; the `AgentRegistered` event is preserved for wire-compatibility
 with `IdentityLite`. See [01-identity.md](01-identity.md).

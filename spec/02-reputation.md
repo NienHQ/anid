@@ -127,18 +127,34 @@ function scoreFor(uint256 agentId)
 // Only a registered engine may write. Every write is execution-bound.
 function recordOutcome(
     uint256 agentId,
-    bytes32 executionProof,   // settled txhash | TEE digest | zk proof id  (ref)
-    bytes32 counterpartyId,   // enforced independent of agentId
-    int256  scoreDelta,       // signed: rewards AND penalties (feeds g(oₜ))
-    bytes32 feedbackCommit,   // keccak of off-chain evidence (e.g. Greenfield CID)
-    bytes32 policyId          // which engine policy was satisfied / violated
+    ExecutionProof calldata proof,   // { ProofKind kind; bytes32 ref; } — ref != 0
+    bytes32 counterpartyId,          // enforced independent of agentId
+    Outcome calldata outcome,        // signed rewards, one per score (see below)
+    bytes32 feedbackCommit,          // keccak of off-chain evidence (e.g. Greenfield CID)
+    bytes32 policyId                 // which engine policy was satisfied / violated
 ) external onlyRegisteredEngine;
 ```
+
+Because ANID is a **two-score** model (§3), a write carries one signed reward **per
+score**, each feeding its own EMA:
+
+```solidity
+struct Outcome {
+    int256 trustDelta;   // g_trust(oₜ) ∈ [−1e18, 1e18]  — settlement / counterparty outcome
+    int256 perfDelta;    // g_perf(oₜ)  ∈ [−1e18, 1e18]  — executed (+) vs blocked/reverted (−)
+}
+```
+
+> **Reconciliation note.** The original org-doc sketch took a single
+> `int256 scoreDelta`. This spec carries **two** signed deltas so the two-score
+> model (trust *and* performance) is updated atomically and unambiguously; a single
+> delta could not drive two independent EMAs. Each delta is the WAD-scaled `g(oₜ)`.
 
 What is **absent** is the point: no open `submitFeedback`, no anonymous writers, no
 raw star ratings. See the full interface in [06-interfaces.md](06-interfaces.md) and
 the invariant tests under [`contracts/test/`](../contracts/) that hold this section
-to its word.
+to its word — `recordOutcome` reverts on a non-engine caller, an empty proof, an
+out-of-range reward, and a related counterparty; a negative delta lowers the score.
 
 ## Related
 
