@@ -1,0 +1,33 @@
+{
+  "name": "anid-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the ANID registries (ethers v6, generated types).",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "generate": "forge build --root ../contracts && typechain --target ethers-v6 --out-dir src/typechain '../contracts/out/EngineRegistry.sol/EngineRegistry.json' '../contracts/out/ReputationRegistry.sol/ReputationRegistry.json' '../contracts/out/IdentityRegistry.sol/IdentityRegistry.json' '../contracts/out/ValidationRegistry.sol/ValidationRegistry.json'",
+    "build": "pnpm generate && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepare": "pnpm build"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.5.1",
+    "typechain": "^8.3.2",
+    "typescript": "^5.5.0"
+  }
+}

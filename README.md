@@ -24,6 +24,7 @@ receipts, not opinions.
 - `SPEC.md` — the canonical normative spec (entry point; links into `spec/`).
 - `spec/` — per-component specification.
 - `contracts/` — Foundry reference implementation of the four registries.
+- `sdk/` — TypeScript SDK (ethers v6, generated types) for reading/writing the registries.
 - `PLAN.md` — working build plan.
 
 ## Scope
