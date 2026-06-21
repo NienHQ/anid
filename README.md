@@ -21,6 +21,7 @@ receipts, not opinions.
 
 ## Repo layout
 
+- `WHITEPAPER.md` — the ANID whitepaper (full design narrative, by Nien Labs).
 - `SPEC.md` — the canonical normative spec (entry point; links into `spec/`).
 - `spec/` — per-component specification.
 - `contracts/` — Foundry reference implementation of the four registries.
